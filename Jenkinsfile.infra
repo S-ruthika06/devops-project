@@ -36,11 +36,7 @@ pipeline {
                 }
             }
         }
-        stage('Approve') {
-            steps { 
-                input message: 'Plan reviewed. Apply to AWS?' 
-            }
-        }
+        
         stage('Apply') {
             steps {
                 withCredentials([
