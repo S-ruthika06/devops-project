@@ -30,9 +30,9 @@ pipeline {
     }
     post { 
         always { 
-            node('docker-runner') {
-                sh 'docker logout ghcr.io || true' 
-            }
+            
+            sh 'docker logout ghcr.io || true' 
+            
         } 
     }
 }
