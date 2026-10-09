@@ -1,0 +1,36 @@
+pipeline {
+    agent { label 'docker-runner' }
+    environment {
+        IMAGE = 'ghcr.io/s-ruthika06/devops-app'
+    }
+    stages {
+        stage('Checkout') { 
+            steps { 
+                checkout scm 
+            } 
+        }
+        stage('Build') {
+            steps {
+                sh 'docker build -t $IMAGE:$BUILD_NUMBER -t $IMAGE:latest .'
+            }
+        }
+        stage('Push to GHCR') {
+            steps {
+                withCredentials([usernamePassword(credentialsId: 'ghcr-write',
+                                                 usernameVariable: 'GH_USER', 
+                                                 passwordVariable: 'GH_TOKEN')]) {
+                    sh '''
+                        echo "$GH_TOKEN" | docker login ghcr.io -u "$GH_USER" --password-stdin
+                        docker push $IMAGE:$BUILD_NUMBER
+                        docker push $IMAGE:latest
+                    '''
+                }
+            }
+        }
+    }
+    post { 
+        always { 
+            sh 'docker logout ghcr.io || true' 
+        } 
+    }
+}
