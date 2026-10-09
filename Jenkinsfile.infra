@@ -1,0 +1,46 @@
+pipeline {
+    agent any
+    environment {
+        AWS_DEFAULT_REGION = 'ap-south-1'
+        TF_IN_AUTOMATION   = 'true'
+    }
+    stages {
+        stage('Checkout') { 
+            steps { checkout scm } 
+        }
+        stage('Init & Validate') {
+            steps {
+                withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws-creds']]) {
+                    dir('terraform practise') {
+                        sh 'terraform init -input=false'
+                        sh 'terraform fmt -check'
+                        sh 'terraform validate'
+                    }
+                }
+            }
+        }
+        stage('Plan') {
+            steps {
+                withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws-creds']]) {
+                    dir('terraform practise') { 
+                        sh 'terraform plan -input=false -out=tfplan' 
+                    }
+                }
+            }
+        }
+        stage('Approve') {
+            steps { 
+                input message: 'Plan reviewed. Apply to AWS?' 
+            }
+        }
+        stage('Apply') {
+            steps {
+                withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws-creds']]) {
+                    dir('terraform practise') { 
+                        sh 'terraform apply -input=false tfplan' 
+                    }
+                }
+            }
+        }
+    }
+}
