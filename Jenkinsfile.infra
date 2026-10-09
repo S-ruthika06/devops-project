@@ -6,11 +6,16 @@ pipeline {
     }
     stages {
         stage('Checkout') { 
-            steps { checkout scm } 
+            steps { 
+                checkout scm 
+            } 
         }
         stage('Init & Validate') {
             steps {
-                withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws-creds']]) {
+                withCredentials([
+                    string(credentialsId: 'aws-access-key-id', variable: 'AWS_ACCESS_KEY_ID'),
+                    string(credentialsId: 'aws-secret-access-key', variable: 'AWS_SECRET_ACCESS_KEY')
+                ]) {
                     dir('terraform practise') {
                         sh 'terraform init -input=false'
                         sh 'terraform fmt -check'
@@ -21,7 +26,10 @@ pipeline {
         }
         stage('Plan') {
             steps {
-                withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws-creds']]) {
+                withCredentials([
+                    string(credentialsId: 'aws-access-key-id', variable: 'AWS_ACCESS_KEY_ID'),
+                    string(credentialsId: 'aws-secret-access-key', variable: 'AWS_SECRET_ACCESS_KEY')
+                ]) {
                     dir('terraform practise') { 
                         sh 'terraform plan -input=false -out=tfplan' 
                     }
@@ -35,7 +43,10 @@ pipeline {
         }
         stage('Apply') {
             steps {
-                withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws-creds']]) {
+                withCredentials([
+                    string(credentialsId: 'aws-access-key-id', variable: 'AWS_ACCESS_KEY_ID'),
+                    string(credentialsId: 'aws-secret-access-key', variable: 'AWS_SECRET_ACCESS_KEY')
+                ]) {
                     dir('terraform practise') { 
                         sh 'terraform apply -input=false tfplan' 
                     }
