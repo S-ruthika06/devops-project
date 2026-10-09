@@ -7,9 +7,9 @@ resource "aws_vpc" "demovpc" {
   }
 }
 resource "aws_subnet" "sub-a" {
-  vpc_id     = aws_vpc.demovpc.id
-  cidr_block = "11.0.1.0/24"
-  availability_zone = "us-east-1a"
+  vpc_id                  = aws_vpc.demovpc.id
+  cidr_block              = "11.0.1.0/24"
+  availability_zone       = "us-east-1a"
   map_public_ip_on_launch = true
 
   tags = {
@@ -17,9 +17,9 @@ resource "aws_subnet" "sub-a" {
   }
 }
 resource "aws_subnet" "sub-b" {
-  vpc_id     = aws_vpc.demovpc.id
-  cidr_block = "11.0.2.0/24"
-  availability_zone = "us-east-1b"
+  vpc_id                  = aws_vpc.demovpc.id
+  cidr_block              = "11.0.2.0/24"
+  availability_zone       = "us-east-1b"
   map_public_ip_on_launch = true
 
   tags = {
